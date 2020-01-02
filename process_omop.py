@@ -63,5 +63,5 @@ if __name__ == '__main__':
     pickle.dump(matrix, open(outFile+'.npy', 'wb'), -1)
     with open ('./condtion_type.csv', 'w') as f:
         for key, value in condition_index.items():
-            text = key+','+value+'\n'
+            text = str(key)+','+str(value)+'\n'
             f.writelines(text)
