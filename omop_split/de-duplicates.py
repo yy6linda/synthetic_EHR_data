@@ -1,0 +1,51 @@
+import pandas as pd
+condition = pd.read_csv("./condition_occurrence.csv")
+c = condition.drop_duplicates(subset = ["person_id","condition_concept_id","condition_start_date"])
+c.to_csv("./de_duplicates/condition_occurrence.csv")
+print("condition deduplicated", flush = True)
+print("before:{}".format(condition.shape), flush = True)
+print("after:{}".format(c.shape), flush = True)
+
+drug = pd.read_csv("./drug_exposure.csv")
+d = drug.drop_duplicates(subset = ["person_id","drug_concept_id","drug_exposure_start_date"])
+d.to_csv("./de_duplicates/drug_exposure.csv")
+print("drug deduplicated", flush = True)
+print("before:{}".format(drug.shape), flush = True)
+print("after:{}".format(d.shape), flush = True)
+
+visit = pd.read_csv("./visit_occurrence.csv")
+v = visit.drop_duplicates(subset = ["person_id","visit_concept_id","visit_start_date"])
+v.to_csv("./de_duplicates/visit_occurrence.csv")
+print("visit deduplicated", flush = True)
+print("before:{}".format(visit.shape), flush = True)
+print("after:{}".format(v.shape), flush = True)
+
+procedure = pd.read_csv("./procedure_occurrence.csv")
+p = procedure.drop_duplicates(subset = ["person_id","procedure_concept_id","procedure_date"])
+p.to_csv("./de_duplicates/procedure_occurrence.csv")
+print("procedure deduplicated", flush = True)
+print("before:{}".format(procedure.shape), flush = True)
+print("after:{}".format(p.shape), flush = True)
+
+
+measurement = pd.read_csv("./measurement.csv")
+m = measurement.drop_duplicates(subset = ["person_id","measurement_concept_id","measurement_date"])
+m.to_csv("./de_duplicates/measurement.csv")
+print("measurement deduplicated", flush = True)
+print("before:{}".format(measurement.shape), flush = True)
+print("after:{}".format(m.shape), flush = True)
+
+observation_period = pd.read_csv("./observation_period.csv")
+op = observation_period.drop_duplicates(subset = ["person_id","period_type_concept_id",
+"observation_period_start_date","observation_period_end_date"])
+op.to_csv("./de_duplicates/observation_period.csv")
+print("observation_period deduplicated", flush = True)
+print("before:{}".format(observation_period.shape), flush = True)
+print("after:{}".format(op.shape), flush = True)
+
+observation = pd.read_csv("./observation.csv")
+o = observation.drop_duplicates(subset = ["person_id","observation_concept_id","observation_date"])
+o.to_csv("./de_duplicates/observation.csv")
+print("observation deduplicated", flush = True)
+print("before:{}".format(observation.shape), flush = True)
+print("after:{}".format(o.shape), flush = True)

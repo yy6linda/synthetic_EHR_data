@@ -23,8 +23,7 @@ if os.path.basename(os.getcwd()) != "app":
     os.chdir(os.getcwd() +'./app')
 
 import configs as model_configs
-from datetime import datetime
-import dateutil.relativedelta
+
 
 def read_ehrdc_data(path, data_keys=None, label_keys=None, useful_keys=None, expand_labels=("person", "person_id", "death_date"),
                     filter_useful=True, apply_label_fn=model_configs.str_to_year):
@@ -46,16 +45,15 @@ def read_ehrdc_data(path, data_keys=None, label_keys=None, useful_keys=None, exp
                 useful_keys[r["TabNam"]].append(r["ColNam"])
     data = {}
     labels = {}
-    b = pd.Series()
     for k in data_keys:
         f = path + k + ".csv"
         if pathlib.Path(f).exists():
             useful_keys[k] = list(set(useful_keys[k]).intersection(set(pd.read_csv(f, nrows=0).columns)))
             data[k] = pd.read_csv(f, usecols=useful_keys[k])
             data[k] = data[k].dropna(axis=1, how="all")
-            #print("print(data['{}'])".format(k), flush = True)
-            #print(data[k].columns)
-            #print(data[k].head(5),flush =True)
+            print("print(data['{}'])".format(k), flush = True)
+            print(data[k].columns)
+            print(data[k].head(5),flush =True)
     for k in label_keys:
         ## death_table read
         f = path +  "death.csv"
@@ -65,28 +63,21 @@ def read_ehrdc_data(path, data_keys=None, label_keys=None, useful_keys=None, exp
             ## Yao's note: add this part because the original method didn't take into account not all patients in
             ## death table is a positive taking into the six months requirement
             visit = pd.read_csv(path + "visit_occurrence.csv", usecols=['person_id','visit_start_date'])
-            print("visit.shape, flush = True")
-            print(visit.shape, flush = True)
             labels[k] = labels[k].merge(visit, on = 'person_id',how = "inner")
             labels[k]["death_date"] = pd.to_datetime(labels[k]["death_date"],errors='coerce')
             labels[k]["visit_start_date"] = pd.to_datetime(labels[k]["visit_start_date"],errors='coerce')
             labels[k]["difference"] = labels[k].apply(lambda x: x["death_date"]-dateutil.relativedelta.relativedelta(months=6) <= x["visit_start_date"], axis=1)
-            positive_person_id = labels[k][labels[k]["difference"]]["person_id"]
-            print("positive_person_id.shape", flush = True)
-            print(positive_person_id.shape, flush = True)
-            #print(set(positive_person_id), flush = True)
-            positives = set(positive_person_id)
+            positives = set(labels[k][labels[k]["difference"]][["person_id"]])
             ## Yao's note: add this part
-            print("len(positives)",flush = True)
-            print(len(positives),flush = True)
             if expand_labels:
                 expand_values = {k:v for k,v in zip(labels[k][expand_labels[1]], labels[k][expand_labels[2]])}
                 inds = data[expand_labels[0]][expand_labels[1]]
                 a = pd.Series([apply_label_fn(expand_values[i]) if i in positives else np.nan for i in inds])
                 b = pd.Series([int(i in positives) for i in inds])
                 data[k] = pd.concat([inds, b, a], axis=1, keys=[inds.name, "label", expand_labels[2]])
-                #print("print(data['death'])", flush = True)
-                #print("*******",flush = True)
+                print("print(data['death'])", flush = True)
+                print(len(b),flush = True)
+                print(b, flush = True)
 
 
     return data
